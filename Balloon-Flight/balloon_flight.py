@@ -172,6 +172,7 @@ def update():
             update_high_scores()
 
         if (balloon.collidepoint(bird.x, bird.y) or
+                balloon.collidepoint(bird2.x, bird2.y) or
                 balloon.collidepoint(house.x, house.y) or
                 balloon.collidepoint(tree.x, tree.y)):
             game_over = True
