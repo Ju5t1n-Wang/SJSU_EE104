@@ -1,0 +1,204 @@
+Author: Justin Wang
+Class: EE104
+
+*** Needed libraries and packages **
+
+
+We need a couple of libraries and packages listed below here for this lab.
+
+A) Packages for yolo5v folder
+https://wandb.ai/onlineinference/YOLO/reports/YOLOv5-Object-Detection-on-Windows-Step-By-Step-Tutorial---VmlldzoxMDQwNzk4 
+
+B) Packages for ModifiedOpenLabelling-main folder
+https://wandb.ai/onlineinference/YOLO/reports/Collect-and-Label-Images-to-Train-a-YOLOv5-Object-Detection-Model-in-PyTorch--VmlldzoxMzQxODc3
+
+C) Packages for Dance Challenge Game
+import pgzrun #runs the pygame 
+from pgzero.builtins import *
+import pygame
+from random import randint
+from pgzero.builtins import Actor #object in the game (like sprites in scratch)
+
+
+1) yolo5v & ModifiedOpenLabelling-main folder
+
+
+2) Dance challenge
+
+This program will run a game called Dance Challenge where a character will do a dance and the player needs to recreate the dance.
+I won't go over the basis of the game because you can find all the data on how to do this in the Coding Games in Python book (chapter 9)
+I've followed the book to get the basic game and now we're going to make a couple alterations.
+
+A) Longer dance
+
+To make the dance longer I changed the dance_lenght variable from 4 to 5
+And the count variable in the generate moves and global declaration from 4 to 5 
+Line 26 -> dance_length = 5
+Line 25 -> count = 5
+Line 152 -> count = 5
+
+B) Change the music
+
+To change the music I downloaded a different song, I kept the file type the same as the original song which is .ogg
+Next I changed the path to the song to the path off the new song
+Line 280 -> music.play("falling-sky")   
+
+C) Add another player
+
+Adding another player to the game required a few new lines of code, first we need 2 new variables score1 and score2 which hold each 
+players scores.
+
+Line 22 -> score1 = 0
+Line 23 -> score2 = 0
+
+Next we need to add the score board for player 2, this gets done in the draw function by adding the following code:
+
+        screen.draw.text("Player 2 score: " +
+                         str(score2), color="black",
+                         topleft=(650, 10))
+
+The next step is to announce which player will be playing, this gets done by declaring player variables that determine which player is playing and the display_player variable
+
+Line 27 -> display_player = True
+Line 30 -> player1 = True
+Line 31 -> player2 = False
+
+In the draw function we add an if function which determines whether to show the countdown or dance or which player is up:
+
+ if display_player:
+            if player1:
+                screen.draw.text("Player 1 you're up!", 
+                                 color="black",
+                                 topleft=(CENTER_X - 180, 150), fontsize=60)
+            if player2:
+                screen.draw.text("Player 2 you're up!", 
+                                 color="black",
+                                 topleft=(CENTER_X - 180, 150), fontsize=60)
+        else:
+            if say_dance:
+                screen.draw.text("Dance!", color="black",
+                                 topleft=(CENTER_X - 65, 150), fontsize=60)
+            if show_countdown:
+                screen.draw.text(str(count), color="black",
+                                     topleft=(CENTER_X - 8, 150), fontsize=60)
+    else:
+        screen.clear()
+        screen.blit("stage", (0, 0))
+        screen.draw.text("Player 1 score: " +
+                         str(score1), color="black",
+                         topleft=(10, 10))
+        screen.draw.text("Player 2 score: " +
+                         str(score2), color="black",
+                         topleft=(650, 10))
+        screen.draw.text("GAME OVER!", color="black",
+                         topleft=(CENTER_X - 130, 150), fontsize=60)
+        screen.draw.text("Song: Falling Sky", color="blue",
+                         topleft=(CENTER_X - 130, 200), fontsize=60)
+        screen.draw.text("By: audionautix", color="blue",
+                         topleft=(CENTER_X - 130, 250), fontsize=60)
+
+I made a new function to display which player will be playing for a specific amount of time, it works just like the countdown function.
+This function will show which player is up for 3 second through the display_time variable. Also, there will be a text in the game over screen showing the title and artist of the new music.
+
+Line 28 -> display_time = 3
+
+def start_game():
+    global player1, player2, display_player, display_time
+    if display_time > 1:
+        display_player = True
+        display_time = display_time - 1
+        clock.schedule(start_game, 1)
+    else:
+        display_player = False
+        generate_moves() 
+        pygame.mixer.init()
+        music.play("game_sound")    
+
+Lastly we need to implement the new key touches for player 2, additionally, we modify the code from player one when he makes the wrong move 
+so that the game doesn't end but restarts and displays player 2.
+Only when player 2 makes a wrong move the game will end.
+
+def on_key_up(key):
+    global score1, score2, game_over, move_list, current_move, player1, player2, display_time, say_dance
+    print(key)
+    if player1:
+        if key == keys.UP:
+            update_dancer(0)
+            if move_list[current_move] == 0:
+                score1 = score1 + 1
+                next_move()
+            else:
+                player1 = False
+                player2 = True
+                say_dance = False
+                display_time = 3
+                start_game()
+        elif key == keys.RIGHT:
+            update_dancer(1)
+            if move_list[current_move] == 1:
+                score1 = score1 + 1
+                next_move()
+            else:
+                player1 = False
+                player2 = True
+                say_dance = False
+                display_time = 3
+                start_game()
+        elif key == keys.DOWN:
+            update_dancer(2)
+            if move_list[current_move] == 2:
+                score1 = score1 + 1
+                next_move()
+            else:
+                player1 = False
+                player2 = True
+                say_dance = False
+                display_time = 3
+                start_game()
+        elif key == keys.LEFT:
+            update_dancer(3)
+            if move_list[current_move] == 3:
+                score1 = score1 + 1
+                next_move()
+            else:
+                player1 = False
+                player2 = True
+                say_dance = False
+                display_time = 3
+                start_game()
+    if player2:
+            if key == keys.W:
+                update_dancer(0)
+                if move_list[current_move] == 0:
+                    score2 = score2 + 1
+                    next_move()
+                else:
+                    game_over = True
+            elif key == keys.D:
+                update_dancer(1)
+                if move_list[current_move] == 1:
+                    score2 = score2 + 1
+                    next_move()
+                else:
+                    game_over = True
+            elif key == keys.S:
+                update_dancer(2)
+                if move_list[current_move] == 2:
+                    score2 = score2 + 1
+                    next_move()
+                else:
+                    game_over = True
+            elif key == keys.A:
+                update_dancer(3)
+                if move_list[current_move] == 3:
+                    score2 = score2 + 1
+                    next_move()
+                else:
+                    game_over = True
+    return
+
+The game should run without any problems now, player 1 is up first and plays until he makes a mistake, if he makes
+a mistake, player 2 will start playing until they make a mistake.
+
+
+
